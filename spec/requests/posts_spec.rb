@@ -14,10 +14,9 @@ RSpec.describe "Posts", type: :request do
 
   describe "with data in the DB" do
     let!(:posts) { create_list(:post, 10, published: true)}
+    before { get '/posts' }
 
     it "should return all the published posts" do
-      # byebug
-      before { get '/posts' }
       payload = JSON.parse(response.body)
       expect(payload.size).to eq(posts.size)
       expect(response).to have_http_status(200)
@@ -25,13 +24,13 @@ RSpec.describe "Posts", type: :request do
   end
 
   describe "GET /posts/{id}" do
-    let(:post) { create(:post) }
+    let!(:post) { create(:post) }
 
     it "should return a post" do
       get "/posts/#{post.id}"
       payload = JSON.parse(response.body)
       expect(payload).to_not be_empty
-      expect(payload["id"]).to eq(post.id)
+      expect(payload['id']).to eq(post.id)
       expect(response).to have_http_status(200)
     end
   end
@@ -52,7 +51,7 @@ RSpec.describe "Posts", type: :request do
       post "/posts", params: req_payload
       payload = JSON.parse(response.body)
       expect(payload).to_not be_empty
-      expect(payload['id']).to_not be_empty
+      expect(payload['id']).to_not be_nil
       expect(response).to have_http_status(:created)
     end
 
@@ -97,8 +96,7 @@ RSpec.describe "Posts", type: :request do
         post: {
           title: nil,
           content: nil,
-          published: false,
-          user_id: user.id
+          published: false
         }
       }
       # PUT HTTP
